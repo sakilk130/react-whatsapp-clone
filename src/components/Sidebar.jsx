@@ -13,7 +13,7 @@ function Sidebar() {
   const [rooms, setRooms] = useState([]);
   const [loadingRoom, setLoadingRoom] = useState(true);
   useEffect(() => {
-    db.collection('rooms').onSnapshot(
+    const unsubscribe = db.collection('rooms').onSnapshot(
       (snapshot) =>
         setRooms(
           snapshot.docs.map((doc) => ({
@@ -23,6 +23,9 @@ function Sidebar() {
         ),
       setLoadingRoom(false)
     );
+    return () => {
+      unsubscribe();
+    };
   }, []);
   return (
     <div className="sidebar">
