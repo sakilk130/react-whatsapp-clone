@@ -9,6 +9,7 @@ import { SearchOutlined } from '@material-ui/icons';
 import SidebarChat from './SidebarChat';
 import db from '../firebase/config';
 import { useStateValue } from '../context/StateProvider';
+import ContentLoader from 'react-content-loader';
 
 function Sidebar() {
   const [{ user }, dispach] = useStateValue();
@@ -53,13 +54,30 @@ function Sidebar() {
       </div>
       <div className="sidebar__chats">
         <SidebarChat addNewChat />
-        {loadingRoom ? (
-          <p>Loading</p>
-        ) : (
-          rooms.map((room) => (
-            <SidebarChat key={room.id} id={room.id} name={room.data.name} />
-          ))
+
+        {loadingRoom && (
+          <ContentLoader
+            speed={2}
+            width={400}
+            height={160}
+            viewBox="0 0 400 160"
+            backgroundColor="#a39f9f"
+            foregroundColor="#ecebeb"
+          >
+            <rect x="48" y="8" rx="3" ry="3" width="88" height="6" />
+            <rect x="54" y="25" rx="3" ry="3" width="52" height="6" />
+            <circle cx="24" cy="22" r="20" />
+            <circle cx="28" cy="80" r="20" />
+            <rect x="52" y="66" rx="3" ry="3" width="88" height="6" />
+            <rect x="57" y="83" rx="3" ry="3" width="52" height="6" />
+            <circle cx="28" cy="138" r="20" />
+            <rect x="55" y="122" rx="3" ry="3" width="88" height="6" />
+            <rect x="62" y="140" rx="3" ry="3" width="52" height="6" />
+          </ContentLoader>
         )}
+        {rooms.map((room) => (
+          <SidebarChat key={room.id} id={room.id} name={room.data.name} />
+        ))}
       </div>
     </div>
   );

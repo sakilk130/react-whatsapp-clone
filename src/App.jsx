@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Chat from './components/Chat';
 import Login from './components/Login';
 import { useStateValue } from './context/StateProvider';
+import Home from './components/Home';
 
 function App() {
   const [{ user }, dispach] = useStateValue();
@@ -21,7 +22,7 @@ function App() {
                 <Chat />
               </Route>
               <Route path="/">
-                <Chat />
+                <Home />
               </Route>
             </Switch>
           </Router>

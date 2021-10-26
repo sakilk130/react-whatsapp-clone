@@ -8,6 +8,8 @@ import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import db from '../firebase/config';
 import { useStateValue } from '../context/StateProvider';
 import firebase from 'firebase';
+import MoonLoader from 'react-spinners/MoonLoader';
+import { css } from '@emotion/react';
 
 function Chat() {
   const [seed, setSeed] = useState('');
@@ -16,6 +18,14 @@ function Chat() {
   const [roomName, setRoomName] = useState([]);
   const [messages, setMessage] = useState([]);
   const [{ user }, dispatch] = useStateValue();
+  let [loading, setLoading] = useState(true);
+  let [color, setColor] = useState('#0a8d48');
+
+  const override = css`
+    display: block;
+    margin: 0 auto;
+    border-color: green;
+  `;
 
   useEffect(() => {
     if (roomId) {
@@ -28,9 +38,10 @@ function Chat() {
         .doc(roomId)
         .collection('messages')
         .orderBy('timestamp', 'asc')
-        .onSnapshot((snapshot) =>
-          setMessage(snapshot.docs.map((doc) => doc.data()))
-        );
+        .onSnapshot((snapshot) => {
+          setMessage(snapshot.docs.map((doc) => doc.data()));
+          setLoading(false);
+        });
     }
   }, [roomId]);
 
@@ -48,7 +59,6 @@ function Chat() {
     setInput('');
   };
 
-  console.log(input);
   return (
     <div className="chat">
       <div className="chat__header">
@@ -59,7 +69,11 @@ function Chat() {
             Last seen at{' '}
             {new Date(
               messages[messages.length - 1]?.timestamp?.toDate()
-            ).toUTCString()}
+            ).toUTCString() === 'Invalid Date'
+              ? '...'
+              : new Date(
+                  messages[messages.length - 1]?.timestamp?.toDate()
+                ).toUTCString()}
           </p>
         </div>
         <div className="chat__headerRight">
@@ -75,19 +89,31 @@ function Chat() {
         </div>
       </div>
       <div className="chat__body">
-        {messages.map((message) => (
-          <p
-            className={`chat__message ${
-              message.name == user.displayName && 'chat__receiver'
-            }`}
-          >
-            <span className="chat__name">{message.name}</span>
-            {message.message}
-            <span className="chat__timestamp">
-              {new Date(message.timestamp?.toDate()).toUTCString()}
-            </span>
-          </p>
-        ))}
+        {true && (
+          <MoonLoader
+            color={color}
+            loading={loading}
+            css={override}
+            size={100}
+          />
+        )}
+        {messages.length === 0 ? (
+          <h3 style={{ display: 'grid', placeItems: 'center' }}>No Message</h3>
+        ) : (
+          messages.map((message) => (
+            <p
+              className={`chat__message ${
+                message.name === user.displayName && 'chat__receiver'
+              }`}
+            >
+              <span className="chat__name">{message.name}</span>
+              {message.message}
+              <span className="chat__timestamp">
+                {new Date(message.timestamp?.toDate()).toUTCString()}
+              </span>
+            </p>
+          ))
+        )}
       </div>
       <div className="chat__footer">
         <InsertEmoticonIcon />
